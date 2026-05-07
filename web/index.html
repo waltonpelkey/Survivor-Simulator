@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Survivor Simulator Web Edition</title>
+  <link rel="stylesheet" href="styles/main.css">
+</head>
+<body>
+  <div class="shell">
+    <section class="hero">
+      <h1>Survivor Simulator</h1>
+      <p>Build a cast, shape the season, and watch the story unfold.</p>
+    </section>
+
+    <main class="layout">
+      <div class="panel tab-shell">
+        <div class="tab-list" role="tablist">
+          <button id="setupTabButton" class="tab-button is-active" data-tab-target="setupPanel" type="button">Simulator Setup</button>
+          <button id="resultsTabButton" class="tab-button" data-tab-target="resultsPanel" type="button" disabled>Season Recap</button>
+        </div>
+      </div>
+
+      <section id="setupPanel" class="panel controls tab-panel">
+        <h2>Simulator Setup</h2>
+
+        <div class="field-grid">
+          <div class="field">
+            <label for="seedInput">Seed</label>
+            <input id="seedInput" type="text" placeholder="Leave blank for a fresh run">
+          </div>
+          <div class="field">
+            <label for="finalistsInput">Finalists</label>
+            <input id="finalistsInput" type="number" min="2" max="3" step="1" value="2">
+          </div>
+          <div class="field">
+            <label for="juryInput">Jury size</label>
+            <input id="juryInput" type="number" min="0" step="1" value="7">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Cast Builder</label>
+          <div class="table-wrap">
+            <table class="cast-builder">
+              <thead>
+                <tr>
+                  <th>Player</th>
+                  <th>Photo</th>
+                  <th>Strategy</th>
+                  <th>Threat</th>
+                  <th>Social</th>
+                  <th>Challenge</th>
+                  <th>Remove</th>
+                </tr>
+              </thead>
+              <tbody id="castEditorBody"></tbody>
+            </table>
+          </div>
+        </div>
+        <button id="addPlayerButton" type="button">Add Player</button>
+
+        <div class="field">
+          <label>Tribe Builder</label>
+          <div class="field-grid">
+            <div class="field">
+              <label for="startingTribeModeInput">Mode</label>
+              <select id="startingTribeModeInput">
+                <option value="manual">Manual</option>
+                <option value="random">Random</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="startingTribesInput">Starting tribes</label>
+              <input id="startingTribesInput" type="number" value="2" min="1">
+            </div>
+          </div>
+          <p id="tribeBuilderHint" class="subtle cast-help">Name tribes here, then drag contestants into the tribe boxes below.</p>
+          <div id="tribeNamesContainer" class="tribe-names-container"></div>
+          <div id="tribeBoard" class="tribe-board"></div>
+        </div>
+
+        <div class="field">
+          <div class="compact-head">
+            <label>Season Twists</label>
+            <button id="addTwistButton" class="secondary" type="button">Add swap or merge</button>
+          </div>
+          <div id="twistEventsBody" class="twist-events"></div>
+        </div>
+
+        <div class="field advantage-setup">
+          <label class="check-row"><input id="advantagesEnabledInput" type="checkbox" checked><span>Advantages and idols enabled</span></label>
+          <div id="advantageControls">
+            <div class="field-grid">
+              <label class="check-row"><input id="seedStartingTribeIdolsInput" type="checkbox" checked><span>Seed starting tribe idols</span></label>
+              <label class="check-row"><input id="seedMergeIdolInput" type="checkbox" checked><span>Seed merge idol</span></label>
+              <label class="check-row"><input id="auctionEnabledInput" type="checkbox"><span>Auction season</span></label>
+            </div>
+            <div class="field-grid">
+              <div class="field">
+                <label for="advantageSearchInput">Find advantage</label>
+                <input id="advantageSearchInput" type="search" placeholder="Search implemented advantages">
+              </div>
+              <div class="field">
+                <label for="advantageTypeInput">Advantage</label>
+                <select id="advantageTypeInput"></select>
+              </div>
+            </div>
+            <button id="addAdvantageButton" class="secondary" type="button">Add advantage</button>
+            <div id="advantageSeedsBody" class="advantage-seeds"></div>
+          </div>
+        </div>
+
+        <div class="action-row">
+          <button id="loadTestingCastButton" type="button">Load Testing Cast</button>
+          <button id="runButton" class="primary" type="button">Simulate Season</button>
+          <button id="resetButton" type="button">Reset</button>
+        </div>
+        <p id="runMeta" class="subtle">Ready.</p>
+        <p id="logMeta" class="subtle"></p>
+      </section>
+
+      <section id="resultsPanel" class="panel output tab-panel" hidden>
+        <h2>Season Recap</h2>
+        <div class="summary-grid">
+          <div class="winner-card">
+            <h3>Winner</h3>
+            <div class="winner-card-photo" id="winnerPhotoWrap" hidden>
+              <img id="winnerPhoto" class="winner-avatar" alt="Winner portrait">
+            </div>
+            <div id="winnerValue" class="summary-value">-</div>
+            <span id="winnerMeta">Winner details will appear here.</span>
+          </div>
+          <div><h3>Finalists</h3><div id="finalistsValue" class="summary-value">-</div></div>
+          <div><h3>Final Vote</h3><div id="voteValue" class="summary-value">-</div></div>
+          <div><h3>Shape</h3><div id="shapeValue" class="summary-value">-</div><span id="shapeMeta">Merge and swap summary will appear here.</span></div>
+          <div><h3>Episodes</h3><div id="episodeValue" class="summary-value">-</div><span id="episodeMeta">Boot count and jury note will appear here.</span></div>
+        </div>
+
+        <div class="log-actions">
+          <button id="copyButton" class="secondary" type="button">Copy log</button>
+          <button id="downloadButton" class="secondary" type="button">Download log</button>
+        </div>
+
+        <h3>Placements</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Place</th>
+                <th>Player</th>
+                <th>Photo</th>
+                <th>Starting Tribe</th>
+                <th>Strategy</th>
+                <th>Threat</th>
+                <th>Social</th>
+                <th>Challenge</th>
+                <th>Story</th>
+                <th>Jury Votes</th>
+              </tr>
+            </thead>
+            <tbody id="placementsBody"></tbody>
+          </table>
+        </div>
+
+        <h3>Voting History</h3>
+        <div class="table-wrap voting-history"><table><tbody id="votingHistoryBody"></tbody></table></div>
+
+        <h3>Jury Vote</h3>
+        <div class="table-wrap jury-history"><table><tbody id="juryVoteBody"></tbody></table></div>
+
+        <h3>Alliances</h3>
+        <div id="allianceSummary"></div>
+        <ul id="allianceHistoryList"></ul>
+
+        <h3>Season Log</h3>
+        <pre id="seasonLog"></pre>
+      </section>
+    </main>
+  </div>
+
+  <script src="generated/python_sources.generated.js"></script>
+  <script src="scripts/event_dsl.js"></script>
+  <script src="scripts/app.js"></script>
+</body>
+</html>
