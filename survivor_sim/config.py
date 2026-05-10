@@ -64,7 +64,9 @@ class GameConfig:
         "Silver", "Aqua", "Lime", "Coral", "Indigo", "Brown", "Pink", "Charcoal"
     )
     threat_curve_base: float = 5.0
-    threat_curve_max_multiplier: float = 2.0
+    threat_curve_midpoint: float = 0.58
+    threat_curve_steepness: float = 8.0
+    threat_curve_max_multiplier: float = 3.0
     preempt_weight_base: float = 1.6
     strategy_power: float = 1.25
     strategy_vote_weight: float = 2.0

@@ -1,4 +1,5 @@
 ﻿from __future__ import annotations
+import math
 import sys
 
 from survivor_sim.reporting import (
@@ -303,7 +304,9 @@ class GameConfig:
     )
 
     threat_curve_base: float = 5.0
-    threat_curve_max_multiplier: float = 2.0
+    threat_curve_midpoint: float = 0.58
+    threat_curve_steepness: float = 8.0
+    threat_curve_max_multiplier: float = 3.0
     preempt_weight_base: float = 1.6
     strategy_power: float = 1.25
     strategy_vote_weight: float = 2.0
@@ -1556,9 +1559,18 @@ class SurvivorSimulator:
         return min(1.0, max(0.0, (start - now) / denom))
 
     def _threat_multiplier_from_players_left(self) -> float:
-        b = max(1.000001, self.config.threat_curve_base)
         t = self._phase_progress()
-        curve = (b ** t - 1.0) / (b - 1.0)
+        midpoint = min(0.99, max(0.01, float(self.config.threat_curve_midpoint)))
+        steepness = max(0.000001, float(self.config.threat_curve_steepness))
+
+        def sigmoid(x: float) -> float:
+            return 1.0 / (1.0 + math.exp(-x))
+
+        low = sigmoid(-steepness * midpoint)
+        high = sigmoid(steepness * (1.0 - midpoint))
+        current = sigmoid(steepness * (t - midpoint))
+        curve = (current - low) / max(0.000001, high - low)
+        curve = min(1.0, max(0.0, curve))
         return max(0.0, float(self.config.threat_curve_max_multiplier)) * curve
 
     def _update_phase_weights(self) -> None:

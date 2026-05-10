@@ -52,7 +52,7 @@ def test_player_round_reset_clears_transient_state():
     assert player.left_tribal_no_vote is False
 
 
-def test_threat_awareness_curve_starts_at_zero_and_doubles_by_end() -> None:
+def test_threat_awareness_curve_is_sigmoid_and_triples_by_end() -> None:
     players = [Player(f"Player {index}") for index in range(1, 13)]
     sim = SurvivorSimulator(
         players,
@@ -68,10 +68,25 @@ def test_threat_awareness_curve_starts_at_zero_and_doubles_by_end() -> None:
     assert all(player.phase_threat_mult == 0 for player in sim.players)
     assert all(player.phase_preempt_mult == 0 for player in sim.players)
 
+    sim.players = players[:10]
+    sim._update_phase_weights()
+    early = sim.players[0].phase_threat_mult
+
+    sim.players = players[:7]
+    sim._update_phase_weights()
+    merge_window = sim.players[0].phase_threat_mult
+
+    sim.players = players[:5]
+    sim._update_phase_weights()
+    endgame = sim.players[0].phase_threat_mult
+
     sim.players = players[:3]
     sim._update_phase_weights()
-    assert all(player.phase_threat_mult == 2 for player in sim.players)
-    assert all(player.phase_preempt_mult == 2 ** 0.5 for player in sim.players)
+    assert all(player.phase_threat_mult == 3 for player in sim.players)
+    assert all(player.phase_preempt_mult == 3 ** 0.5 for player in sim.players)
+    assert 0 < early < 0.25
+    assert 1.25 < merge_window < 1.5
+    assert 2.5 < endgame < 2.75
 
 
 def test_generated_tribe_names_are_unique_syllable_words() -> None:

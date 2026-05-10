@@ -1,18 +1,28 @@
     const STORAGE_KEY = "survivor-simulator-web-v1";
-    const DEFAULT_CAST = `Kitty Powers|1|4|3|5|2
-Serena Williams|1|3|5|3|4
-Dee|1|5|4|4|3
-Q|1|4|4|2|3
-TJ Klune|1|5|2|4|2
-Spongebob|1|2|2|5|2
-Peeta|1|3|3|5|3
-Wendy Williams|2|4|3|4|2
-Pinkie Pie|2|2|3|5|3
-Holly|2|3|2|4|2
-Lizzie|2|4|3|3|2
-Forest|2|3|4|3|4
-Balloony|2|2|2|4|2
-Tom Holland|2|4|4|4|4`;
+    const DEFAULT_CAST = `Toph|1|4|5|3|5
+Raven|1|4|5|2|5
+Maleficent|1|5|5|2|5
+Pearl|1|4|4|3|4
+Cleo de Nile|1|3|3|4|2
+Queen of Hearts|1|2|3|1|1
+Optimus Prime|1|4|5|4|5
+Li Shang|1|4|4|3|5
+Goliath|1|3|4|4|5
+Captain Planet|1|3|5|3|5
+King Triton|1|3|4|3|4
+Mr. Burns|1|4|2|1|1
+Esmerelda|2|3|3|5|3
+Nani|2|3|2|4|3
+Mirabel|2|3|2|5|2
+Vanellope|2|3|4|3|4
+Tiana|2|4|3|4|3
+Mavis|2|3|4|4|4
+Finn the Human|2|2|4|4|5
+Po|2|3|5|5|5
+Danny Phantom|2|3|5|3|5
+Aladdin|2|4|4|5|4
+Hiccup|2|5|3|3|3
+Remy|2|5|2|3|1`;
 
     const DEFAULT_SETTINGS = {
       castText: DEFAULT_CAST,
@@ -2330,10 +2340,15 @@ def run_web_simulation(payload_json):
     }
 
     function threatMultiplier(state, settings) {
-      const base = 5;
+      const midpoint = 0.58;
+      const steepness = 8;
       const t = phaseProgress(state, settings);
-      const curve = (Math.pow(base, t) - 1) / (base - 1);
-      return 2 * curve;
+      const sigmoid = (value) => 1 / (1 + Math.exp(-value));
+      const low = sigmoid(-steepness * midpoint);
+      const high = sigmoid(steepness * (1 - midpoint));
+      const current = sigmoid(steepness * (t - midpoint));
+      const curve = clamp((current - low) / Math.max(0.000001, high - low), 0, 1);
+      return 3 * curve;
     }
 
     function currentJurorCount(state, settings) {
@@ -7899,14 +7914,14 @@ def run_web_simulation(payload_json):
 
       applyPhotoFallbacks();
 
-      const onFirstStep = pageIndex === 0 && (page.kind !== "episode" || revealIndex === 0);
+      const onFirstPage = pageIndex === 0;
       const onLastStep = pageIndex === viewerData.pages.length - 1
         && (page.kind !== "episode" || revealIndex === page.entries.length - 1);
       const hasMoreInEpisode = page.kind === "episode" && revealIndex < page.entries.length - 1;
       const hasNextPage = pageIndex < viewerData.pages.length - 1;
       const nextPageData = hasNextPage ? viewerData.pages[pageIndex + 1] : null;
 
-      prevPage.disabled = onFirstStep;
+      prevPage.disabled = onFirstPage;
       revealEpisode.disabled = page.kind !== "episode" || revealIndex >= page.entries.length - 1;
       nextPage.disabled = onLastStep;
       nextPage.classList.toggle("is-step", hasMoreInEpisode);
@@ -7928,13 +7943,6 @@ def run_web_simulation(payload_json):
     }
 
     function goToPreviousStep() {
-      const page = viewerData.pages[pageIndex];
-      if (page.kind === "episode" && revealIndex > 0) {
-        revealIndex -= 1;
-        renderPage();
-        return;
-      }
-
       if (pageIndex > 0) {
         pageIndex -= 1;
         const previousPage = viewerData.pages[pageIndex];
