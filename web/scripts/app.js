@@ -1,28 +1,28 @@
     const STORAGE_KEY = "survivor-simulator-web-v1";
-    const DEFAULT_CAST = `Toph|1|4|5|3|5
-Raven|1|4|5|2|5
-Maleficent|1|5|5|2|5
-Pearl|1|4|4|3|4
-Cleo de Nile|1|3|3|4|2
-Queen of Hearts|1|2|3|1|1
-Optimus Prime|1|4|5|4|5
-Li Shang|1|4|4|3|5
-Goliath|1|3|4|4|5
-Captain Planet|1|3|5|3|5
-King Triton|1|3|4|3|4
-Mr. Burns|1|4|2|1|1
-Esmerelda|2|3|3|5|3
-Nani|2|3|2|4|3
-Mirabel|2|3|2|5|2
-Vanellope|2|3|4|3|4
-Tiana|2|4|3|4|3
-Mavis|2|3|4|4|4
-Finn the Human|2|2|4|4|5
-Po|2|3|5|5|5
-Danny Phantom|2|3|5|3|5
-Aladdin|2|4|4|5|4
-Hiccup|2|5|3|3|3
-Remy|2|5|2|3|1`;
+    const DEFAULT_CAST = `Catra|1|4|4|2|4
+Merida|1|3|4|3|5
+Miss Piggy|1|3|4|3|2
+Courtney|1|4|3|2|3
+Johnny Bravo|1|2|3|2|4
+Marco Diaz|1|3|3|4|3
+Hades|1|4|4|2|3
+Tom|1|2|2|3|4
+Lindsay|2|2|2|4|2
+Wanda|2|4|5|2|5
+Elphaba|2|5|4|3|4
+Terra|2|3|4|2|5
+Wolverine|2|3|5|2|5
+Sherlock|2|5|4|2|2
+Tadashi|2|4|3|5|3
+Dusty|2|3|3|4|4
+Minnie|3|4|3|5|2
+Mulan|3|4|4|4|5
+Dory|3|2|2|5|2
+Holly O'Hair|3|3|3|4|2
+Spongebob|3|2|3|5|3
+Luca|3|3|3|4|3
+Oso|3|3|2|4|3
+Porky Pig|3|3|2|4|2`;
 
     const DEFAULT_SETTINGS = {
       castText: DEFAULT_CAST,
